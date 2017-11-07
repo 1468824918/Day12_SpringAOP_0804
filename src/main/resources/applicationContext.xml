@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!--目标类 target-->
+    <bean class="com.lanou.aop1.UserDaoImpl"
+          id="userDao"/>
+
+    <!--切面类 aspect-->
+    <bean class="com.lanou.aop3.Transaction"
+          id="transaction"/>
+
+    <!--配置aop-->
+    <aop:config>
+        <!--切入点:目标对象中的方法集合-->
+        <!--意义:告诉Spring调用哪些方法的时候添加通知-->
+        <!--对应的就是UserDaoImpl中的insert和delete方法-->
+        <aop:pointcut id="userPointCut"
+                      expression="execution(* com.lanou.aop1.UserDaoImpl.*(..))"/>
+
+        <!--切面-->
+        <aop:aspect ref="transaction">
+
+            <!--为某个切入点设置通知类型-->
+            <aop:before method="begin" pointcut-ref="userPointCut"/>
+
+
+            <aop:after-throwing method="afterThrowing" pointcut-ref="userPointCut"/>
+            <aop:after method="afterFinally" pointcut-ref="userPointCut"/>
+            <aop:around method="around" pointcut-ref="userPointCut"/>
+
+            <!--接入点正常执行之后的通知-->
+            <aop:after-returning method="commit" pointcut-ref="userPointCut"/>
+        </aop:aspect>
+    </aop:config>
+</beans>
